@@ -35,6 +35,7 @@ public class Login {
 	private JTextField txtPort;
 	private JLabel lblError;
 	private String name = "", IP = "", password;
+	private String orName, orPassword;
 	private JTextField txtIP;
 	private JTextField txtUsername;
 	private JButton btnLogin;
@@ -152,25 +153,30 @@ public class Login {
 						Class.forName("com.mysql.cj.jdbc.Driver");
 						Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/account", "root", "");
 						Statement stm = con.createStatement();
-						String sql = "select * from account where nameAccount='" + name + "'and password ='" + password
-								+ "'";
+						String sql = "select * from account";
 						ResultSet rs = stm.executeQuery(sql);
-						if (rs.next()) {
-						} else {
-							lblError.setText("Wrong Username or Password");
-							lblError.setVisible(true);
+						while (rs.next()) {
+							orName = rs.getString("nameAccount");
+							orPassword = rs.getString("password");
 						}
-						con.close();
+						if (orPassword.equals(password) && orName.equals(name)) {
+			                //do something
+			             
 						if (msg.equals(Tags.SESSION_DENY_TAG)) {
 							lblError.setText(NAME_EXSIST);
 							lblError.setVisible(true);
 							return;
 						}
 
-						
 						new MainGui(IP, portPeer, name, msg);
 						// new menuGUI(IP, portPeer, "toan", msg);
 						frameLoginForm.dispose();
+						rs.close();
+						}
+						else {
+							lblError.setText("WRONG USERNAME OR PASSWORD");
+							lblError.setVisible(true);
+						}
 					} catch (Exception e) {
 						lblError.setText(SERVER_NOT_START);
 						lblError.setVisible(true);
